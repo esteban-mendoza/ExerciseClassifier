@@ -6,4 +6,4 @@ This project was created using Jupyter Notebooks. A static rendered version of t
 
 Author: Jorge Esteban Mendoza Ortiz
 
-Email: [esteban.mendoza@outlook.com](mailto:esteban.mendoza@outlook.com)
+Email: esteban.mendoza@outlook.com
