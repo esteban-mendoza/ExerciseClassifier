@@ -1,6 +1,6 @@
 # Required libraries
-library(tidyverse)
 library(caret)
+library(tidyverse)
 
 # Creating data directory
 dir.create(file.path("data"))
@@ -39,10 +39,10 @@ for (i in 1:nvars) {
 # Dropping variables
 x = x[,vars_to_keep]
 
-
 # Near zero variance
 nzv = nearZeroVar(x, saveMetrics = TRUE)
 x = x[,!nzv$nzv]
 
-
 #
+
+
