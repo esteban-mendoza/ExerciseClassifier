@@ -1,7 +1,9 @@
 ---
 title: "Exercise Classification Project"
-author: "Jorge Esteban Mendoza Ortiz"
-output: html_notebook
+author: "Jorge Esteban Mendoza Ortiz, Applied Mathematician at UNAM, CDMX."
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -71,7 +73,7 @@ testing = testing[,mostly_data]
 ## Model training
 We first will load up the necessary libraries to perform the model fitting. These are as follows.
 
-```{r packages, echo=FALSE, results="hide"}
+```{r packages, message=FALSE}
 # Required libraries
 library(caret)
 library(randomForest)
@@ -124,7 +126,7 @@ The default output of the model object as outlined will provide us with quite so
 print(h)
 ```
 
-As it was already explained, the in-sample accuracy has been estimated using 5 k-folds cross validations, in such a way that the program sampled around 80% of the data, fitted the model and performed a validation on the 20% of the dataset held. The in-sample acuracy is estimated to be around 0.0.9983693, which constitutes a highly accurate fit.
+As it was already explained, the in-sample accuracy has been estimated using 5 k-folds cross validations, in such a way that the program sampled around 80% of the data, fitted the model and performed a validation on the 20% of the dataset held. The in-sample acuracy is estimated to be around 0.9972608, which constitutes a highly accurate fit.
 
 In order to get an estimation of the out-of-sample error, we will compare the prediction ability of the model, using it in the random portion of the set that was left out before training it. This portion represent approximately the 20% of the data.
 
@@ -134,4 +136,4 @@ output = predict(h, validation)
 confusionMatrix(output, validation$classe)
 ```
 
-We can appreciate that we get 100% accuracy even over a considerable portion of the dataset of almost 4000 registers. That being said, we will stick to the more conservative 95% confidence interval of (0.9991, 1) for estimating the out-of-sample error.
+We can appreciate that we get 0.9982 accuracy even over a considerable portion of the dataset of almost 4000 registers. That being said, we will stick to the more conservative 95% confidence interval of (0.9963, 0.9993) for estimating the out-of-sample error.
