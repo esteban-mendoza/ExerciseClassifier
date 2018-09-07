@@ -37,10 +37,6 @@ mostly_data = apply(!is.na(training), 2, mean) > 0.95
 training = training[,mostly_data]
 testing = testing[,mostly_data]
 
-# set.seed(2412)
-# inTrain = createDataPartition(training$classe, p = 0.5, list = FALSE)
-# train0 = training[inTrain,]
-
 ## Training
 h = train(classe ~ ., data=training, method = "rf",
           trControl = trainControl(method = "cv", number = 5, 
