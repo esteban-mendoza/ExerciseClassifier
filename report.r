@@ -8,7 +8,8 @@ cluster <- makeCluster(detectCores())
 registerDoParallel(cluster)
 
 # Creating data directory
-dir.create(file.path("data"))
+if (!dir.exists("data"))
+    dir.create(file.path("data"))
 
 # Downloading data
 url_training = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
