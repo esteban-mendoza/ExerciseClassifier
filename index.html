@@ -11788,7 +11788,8 @@ div#notebook {
 <p>The so-called Human Activity Recognition (HAR) is a research area whose objective is to measure and understand human physical interactions with its environment with the use of sensors and observations of many kinds. For a wider view on HAR, you can refer to the corresponding <a href="https://en.wikipedia.org/wiki/Activity_recognition">Wikipedia article</a>.</p>
 <p>HAR has attracted attention in recent years due to our increasing ability to produce large amounts of data with the use of devices such as <em>Jawbone Up</em>, <em>Nike FuelBand</em>, and <em>Fitbit</em>, that take advantage of sensors such as accelerometers to monitor the physical performance of an individual while performing exercises or other kinds of activities.</p>
 <p>As one might expect, there are many potential applications for HAR, like: elderly monitoring, life log systems for monitoring energy expenditure and for supporting weight-loss programs, and digital assistants for weight lifting exercises.</p>
-<p>The purpose of this project is to use the <a href="http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises"><em>Weight Lifting Exercises (WLE)</em> Dataset</a> to create a classifier that predicts whether an exercise is being properly performed or not. The <em>WLE</em> Dataset was created from measurements of accelerometers placed on the belt, forearm, arm, and dumbbell of 6 participants. The participants were then asked to perform an exercise in 5 different ways - 4 of which constitute common mistakes. Our specific goal will be to build a model that is capable of predicting the <em>classe</em> variable in the dataset, that labels the manner in which the exercise was performed.</p>
+<p>The purpose of this project is to use the <a href="http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises"><em>Weight Lifting Exercises (WLE)</em> Dataset</a> to create a classifier that predicts whether an exercise is being properly performed or not. The <em>WLE</em> Dataset was created from measurements of accelerometers placed on the belt, forearm, arm, and dumbbell of 6 participants. The participants were then asked to perform an exercise in 5 different ways - 4 of which constitute common mistakes. Our specific goal is to build a model that is capable of predicting the <em>classe</em> variable in the dataset, that labels the manner in which the exercise was performed.</p>
+<p>The present report will lay-out the process of building and implementing the model.</p>
 
 </div>
 </div>
@@ -11797,7 +11798,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Pre-processing">Pre-processing<a class="anchor-link" href="#Pre-processing">&#182;</a></h2>
+<h2 id="Exploratory-data-analysis-and-pre-processing">Exploratory data analysis and pre-processing<a class="anchor-link" href="#Exploratory-data-analysis-and-pre-processing">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -11815,16 +11816,36 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-r"><pre><span></span><span class="c1"># Downloading data</span>
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Creating data directory</span>
+<span class="kr">if</span> <span class="p">(</span><span class="o">!</span>dir.exists<span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">))</span>
+    <span class="kp">dir.create</span><span class="p">(</span><span class="kp">file.path</span><span class="p">(</span><span class="s">&quot;data&quot;</span><span class="p">))</span>
 
+<span class="c1"># Downloading data</span>
 url_training <span class="o">=</span> <span class="s">&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;</span>
 url_testing <span class="o">=</span> <span class="s">&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;</span>
 
-download.file<span class="p">(</span>url_training<span class="p">,</span> destfile <span class="o">=</span> <span class="s">&quot;data/pml-training.csv&quot;</span><span class="p">)</span>
-download.file<span class="p">(</span>url_testing<span class="p">,</span> destfile <span class="o">=</span> <span class="s">&quot;data/pml-testing.csv&quot;</span><span class="p">)</span>
+<span class="kr">if</span> <span class="p">(</span><span class="o">!</span><span class="kp">file.exists</span><span class="p">(</span><span class="s">&quot;data/pml-training.csv&quot;</span><span class="p">))</span>
+    download.file<span class="p">(</span>url_training<span class="p">,</span> destfile <span class="o">=</span> <span class="s">&quot;data/pml-training.csv&quot;</span><span class="p">)</span>
+<span class="kr">if</span> <span class="p">(</span><span class="o">!</span><span class="kp">file.exists</span><span class="p">(</span><span class="s">&quot;data/pml-testing.csv&quot;</span><span class="p">))</span>
+    download.file<span class="p">(</span>url_testing<span class="p">,</span> destfile <span class="o">=</span> <span class="s">&quot;data/pml-testing.csv&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Loading data</span>
+training <span class="o">=</span> read.csv<span class="p">(</span><span class="s">&quot;data/pml-training.csv&quot;</span><span class="p">,</span> na.strings<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;NA&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">))</span>
+testing <span class="o">=</span> read.csv<span class="p">(</span><span class="s">&quot;data/pml-testing.csv&quot;</span><span class="p">,</span> na.strings<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;NA&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -11836,9 +11857,39 @@ download.file<span class="p">(</span>url_testing<span class="p">,</span> destfil
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Exploratory-data-analysis">Exploratory data analysis<a class="anchor-link" href="#Exploratory-data-analysis">&#182;</a></h2>
+<p>Now, we will only point out to the few important characteristics and details found in the dataset that required some kind of pre-processing before we could fit the model.</p>
+<p>First of all, we must note that from the 160 available variables in the dataset, we will only use 54 of them. The reasons are the following:</p>
+<ul>
+<li>We plan to fit a random forest model that allows us to predict the <code>classe</code> variable. In order to fit this model, we need our datasets to contain no NAs and we will also drop some unnecessary varilables.</li>
+<li>The first 7 variables in the dataset consist of a redundant variable with the index of each register, usernames and timestamps, that are unnecessary in the model.</li>
+<li>After some exploration we could determine that only 406 of the registers contained no NAs in all the variables, which constitutes little more than 2% of the whole data. This can be verified with the following commmand <code>sum(apply(!is.na(training), 1, all))</code>.</li>
+<li>Furthermore, the NAs are concentrated along more than 100 variables, each of which have more than 95% of NAs on its registers.</li>
+</ul>
+<p>Taking the above points into consideration we will proceed to preprocess our data in order to have a suitable form of it</p>
+
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Dropping index, time stamps and usernames</span>
+training <span class="o">=</span> training<span class="p">[,</span><span class="m">7</span><span class="o">:</span><span class="m">160</span><span class="p">]</span>
+testing <span class="o">=</span> testing<span class="p">[,</span><span class="m">7</span><span class="o">:</span><span class="m">160</span><span class="p">]</span>
+
+<span class="c1">## Dropping mostly NAs varilables</span>
+mostly_data <span class="o">=</span> <span class="kp">apply</span><span class="p">(</span><span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>training<span class="p">),</span> <span class="m">2</span><span class="p">,</span> <span class="kp">mean</span><span class="p">)</span> <span class="o">&gt;</span> <span class="m">0.95</span>
+
+training <span class="o">=</span> training<span class="p">[,</span>mostly_data<span class="p">]</span>
+testing <span class="o">=</span> testing<span class="p">[,</span>mostly_data<span class="p">]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -11852,7 +11903,178 @@ download.file<span class="p">(</span>url_testing<span class="p">,</span> destfil
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>We first will load up the necessary libraries to perform the model fitting. These are as follows.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Required libraries</span>
+<span class="kn">library</span><span class="p">(</span>caret<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>randomForest<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>doParallel<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to improve the fitting of the model, we will setup a parallel cluster.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1"># Parallel processing</span>
+cluster <span class="o">&lt;-</span> makeCluster<span class="p">(</span>detectCores<span class="p">())</span>
+registerDoParallel<span class="p">(</span>cluster<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we proceed to fit a random forest model with <code>caret::train()</code> with the following options:</p>
+<ul>
+<li><p>We select <code>method = "rf"</code>, which calls the randomForest library, already attached.</p>
+</li>
+<li><p>Within the call to <code>caret::trainControl()</code>, we choose to perform cross-validation 5 times with the k-fold method, and</p>
+</li>
+<li><p>We setup <code>allowParallel = TRUE</code> so it can perform a parallel computation with the <code>doParallel</code> backend activated.</p>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>h <span class="o">=</span> train<span class="p">(</span>classe <span class="o">~</span> <span class="m">.</span><span class="p">,</span> data<span class="o">=</span>training<span class="p">,</span> method <span class="o">=</span> <span class="s">&quot;rf&quot;</span><span class="p">,</span>
+          trControl <span class="o">=</span> trainControl<span class="p">(</span>method <span class="o">=</span> <span class="s">&quot;cv&quot;</span><span class="p">,</span> number <span class="o">=</span> <span class="m">5</span><span class="p">,</span> 
+                                   allowParallel <span class="o">=</span> <span class="kc">TRUE</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Lastly, we shut down the cluster and register sequencing processing.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="c1">## Shutting down parallel</span>
+stopCluster<span class="p">(</span>cluster<span class="p">)</span>
+registerDoSEQ<span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Model-performance">Model performance<a class="anchor-link" href="#Model-performance">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The default output of the model object as outlined will provide us with quite some information about the performance of the model.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="kp">print</span><span class="p">(</span>h<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Random Forest 
+
+19622 samples
+   53 predictor
+    5 classes: &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39; 
+
+No pre-processing
+Resampling: Cross-Validated (5 fold) 
+Summary of sample sizes: 15698, 15697, 15699, 15696, 15698 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy   Kappa    
+   2    0.9952092  0.9939398
+  27    0.9977575  0.9971634
+  53    0.9958208  0.9947129
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was mtry = 27.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As it was already explained, the out of sample accuracy has been estimated using 5 k-folds cross validations, in such a way that the program sampled around 80% of the data, fitted the model and performed a validation on the 20% of the dataset held. The out of sample acuracy is estimated to be around 0.9977575, which constitutes an almost perfect fit.</p>
+
 </div>
 </div>
 </div>

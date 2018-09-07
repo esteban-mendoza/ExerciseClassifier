@@ -1,6 +1,11 @@
 # Required libraries
 library(caret)
-library(tidyverse)
+library(randomForest)
+library(doParallel)
+
+# Parallel processing
+cluster <- makeCluster(detectCores())
+registerDoParallel(cluster)
 
 # Creating data directory
 dir.create(file.path("data"))
@@ -9,40 +14,41 @@ dir.create(file.path("data"))
 url_training = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
 url_testing = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 
-download.file(url_training, destfile = "data/pml-training.csv")
-download.file(url_testing, destfile = "data/pml-testing.csv")
+if (!file.exists("data/pml-training.csv"))
+    download.file(url_training, destfile = "data/pml-training.csv")
+
+if (!file.exists("data/pml-testing.csv"))
+    download.file(url_testing, destfile = "data/pml-testing.csv")
 
 # Loading data
-training = read.csv("data/pml-training.csv", na.strings = c("#DIV/0!","NA"))
-testing = read_csv("data/pml-testing.csv", na="#DIV/0!")
+training = read.csv("data/pml-training.csv", na.strings=c("NA",""))
+testing = read.csv("data/pml-testing.csv", na.strings=c("NA",""))
 
-# Dropping row names variable (X)
-training = as_tibble(training)
-training = select(training, -X)
+# Number of complete registers
+sum(apply(!is.na(training), 1, all))
 
-# Copy of training
-x = training
+# Dropping index, time stamps and usernames
+training = training[,7:160]
+testing = testing[,7:160]
 
+## Dropping mostly NAs varilables
+mostly_data = apply(!is.na(training), 2, mean) > 0.95
 
-## Preprocessing
+training = training[,mostly_data]
+testing = testing[,mostly_data]
 
-nvars = dim(x)[2]
-vars_to_keep = vector(length = nvars)
+# set.seed(2412)
+# inTrain = createDataPartition(training$classe, p = 0.5, list = FALSE)
+# train0 = training[inTrain,]
 
-# If a given variable has less than 90% of NA's, we keep it
-for (i in 1:nvars) {
-    if (mean(is.na(x[,i])) < 0.9) {
-        vars_to_keep[i] = TRUE
-    }
-}
+## Training
+h = train(classe ~ ., data=training, method = "rf",
+          trControl = trainControl(method = "cv", number = 5, 
+                                   allowParallel = TRUE))
 
-# Dropping variables
-x = x[,vars_to_keep]
+## Shutting down parallel
+stopCluster(cluster)
+registerDoSEQ()
 
-# Near zero variance
-nzv = nearZeroVar(x, saveMetrics = TRUE)
-x = x[,!nzv$nzv]
-
-#
 
 
