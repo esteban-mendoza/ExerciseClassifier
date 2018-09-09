@@ -18,7 +18,7 @@ A dataset was created from measurements of accelerometers placed on the belt, fo
 
 The project implements a Random Forest predictor in R that determines the manner in which the exercise was performed, based on the measurements of the accelerometers. A report has been created that explains the process of building the model from the data and testing its performance.
 
-A static rendered version of the final report can be found on https://estebanmend.github.io/ExerciseClassifier/, while an executable R script containing the commented code can be found [here](https://github.com/estebanmend/ExerciseClassifier/blob/master/report.r).
+A static rendered version of the final report can be found on https://esteban-mendoza.github.io/ExerciseClassifier/, while an executable R script containing the commented code can be found [here](https://github.com/esteban-mendoza/ExerciseClassifier/blob/master/report.r).
 
 Author: Jorge Esteban Mendoza Ortiz
 
